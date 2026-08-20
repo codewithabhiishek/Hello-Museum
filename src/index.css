@@ -1,1 +1,272 @@
 @import "tailwindcss";
+
+@theme {
+  --color-ultramarine: #1d2bb0;
+  --color-inkdeep: #16208a;
+  --color-midnight: #0b1152;
+  --color-abyss: #070b3a;
+  --color-chalk: #f4f0e4;
+  --color-sun: #ffc53d;
+  --color-signal: #ff4b2e;
+  --color-periwinkle: #9ba5ff;
+
+  --font-display: "Bricolage Grotesque", "Space Grotesk", ui-sans-serif, sans-serif;
+  --font-body: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-midnight);
+  color: var(--color-chalk);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--color-sun);
+  color: var(--color-midnight);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-abyss);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-ultramarine);
+  border: 2px solid var(--color-abyss);
+}
+
+/* ---------- ambient layers ---------- */
+
+.noise {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  pointer-events: none;
+  opacity: 0.08;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.bg-blueprint {
+  background-image:
+    radial-gradient(1100px 700px at 85% -10%, rgba(155, 165, 255, 0.16), transparent 60%),
+    radial-gradient(900px 650px at -10% 25%, rgba(255, 197, 61, 0.08), transparent 55%),
+    radial-gradient(800px 600px at 50% 110%, rgba(255, 75, 46, 0.07), transparent 60%),
+    linear-gradient(rgba(244, 240, 228, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(244, 240, 228, 0.045) 1px, transparent 1px);
+  background-size: auto, auto, auto, 76px 76px, 76px 76px;
+}
+
+.bg-dots-ink {
+  background-image: radial-gradient(rgba(11, 17, 82, 0.16) 1.5px, transparent 1.5px);
+  background-size: 22px 22px;
+}
+
+.text-stroke-chalk {
+  color: transparent;
+  -webkit-text-stroke: 2px rgba(244, 240, 228, 0.3);
+}
+
+.text-stroke-faint {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(244, 240, 228, 0.14);
+}
+
+/* ---------- motion ---------- */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.marquee {
+  overflow: hidden;
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee var(--marquee-dur, 32s) linear infinite;
+}
+.marquee-track.is-paused:hover {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.float-slow {
+  animation: floaty 9s ease-in-out infinite;
+}
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(-1.6%) rotate(var(--rot, 0deg));
+  }
+  50% {
+    transform: translateY(1.6%) rotate(var(--rot, 0deg));
+  }
+}
+
+.spin-slower {
+  animation: spinsl 24s linear infinite;
+}
+@keyframes spinsl {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.blink {
+  animation: blinky 1.4s steps(2, start) infinite;
+}
+@keyframes blinky {
+  50% {
+    opacity: 0;
+  }
+}
+
+.pop {
+  animation: poppy 0.38s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+@keyframes poppy {
+  from {
+    opacity: 0;
+    transform: scale(0.82) rotate(-3deg);
+  }
+}
+
+.cardin {
+  animation: cardin 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes cardin {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+}
+
+.wiggle {
+  animation: wiggley 0.16s linear infinite;
+}
+@keyframes wiggley {
+  0%,
+  100% {
+    transform: rotate(-2.5deg);
+  }
+  50% {
+    transform: rotate(2.5deg);
+  }
+}
+
+.ring-arc {
+  opacity: 0;
+  transform-origin: center;
+}
+.ringing .ring-arc {
+  animation: ringarc 0.55s ease-out infinite;
+}
+.ringing .ring-arc.d2 {
+  animation-delay: 0.13s;
+}
+.ringing .ring-arc.d3 {
+  animation-delay: 0.26s;
+}
+@keyframes ringarc {
+  0% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.18);
+  }
+}
+
+/* ---------- micro-interactions ---------- */
+
+.link-line {
+  position: relative;
+}
+.link-line::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  height: 2px;
+  width: 100%;
+  background: var(--color-sun);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.link-line:hover::after,
+.link-line:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.tape {
+  position: absolute;
+  width: 88px;
+  height: 26px;
+  background: rgba(244, 240, 228, 0.22);
+  border-left: 1px dashed rgba(11, 17, 82, 0.25);
+  border-right: 1px dashed rgba(11, 17, 82, 0.25);
+  box-shadow: 0 1px 4px rgba(7, 11, 58, 0.25);
+}
+
+input:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--color-sun);
+  outline-offset: 2px;
+}
+
+/* ---------- reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+  .marquee-track {
+    animation: none !important;
+  }
+  .marquee {
+    overflow-x: auto;
+  }
+  .float-slow,
+  .spin-slower,
+  .wiggle,
+  .blink {
+    animation: none !important;
+  }
+}
