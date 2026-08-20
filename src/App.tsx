@@ -1,4 +1,4 @@
-import { Noise, Header, Footer } from "./components/Chrome";
+import { Noise, Header, Footer, Spotlight, EasterEgg } from "./components/Chrome";
 import { Opening } from "./components/Opening";
 import { GreetingWall } from "./components/GreetingWall";
 import { Anatomy } from "./components/Anatomy";
@@ -11,6 +11,8 @@ export default function App() {
   return (
     <div className="relative min-h-screen bg-midnight bg-blueprint text-chalk antialiased">
       <Noise />
+      <Spotlight />
+      <EasterEgg />
       <Header />
       <main>
         <Opening />

@@ -1,6 +1,10 @@
 import { useState, type FormEvent } from "react";
+import confetti from "canvas-confetti";
 import { GREETINGS, type Greeting } from "../data/greetings";
 import { SectionHead, Reveal, WaveHand } from "./Chrome";
+import { stampSound, whooshSound } from "../sound";
+import { addHello } from "../store";
+import { usePrefersReducedMotion } from "../hooks";
 
 interface TicketData {
   greeting: Greeting;
@@ -32,11 +36,24 @@ export function Ticket() {
   const [name, setName] = useState("");
   const [ticket, setTicket] = useState<TicketData | null>(null);
   const [stampKey, setStampKey] = useState(0);
+  const reduced = usePrefersReducedMotion();
 
   const issue = (e?: FormEvent) => {
     e?.preventDefault();
     setTicket(rollTicket());
     setStampKey((k) => k + 1);
+    stampSound();
+    whooshSound();
+    addHello(1);
+    if (!reduced) {
+      confetti({
+        particleCount: 70,
+        spread: 62,
+        startVelocity: 26,
+        origin: { x: 0.7, y: 0.6 },
+        colors: ["#ffc53d", "#ff4b2e", "#f4f0e4", "#1d2bb0"],
+      });
+    }
   };
 
   return (

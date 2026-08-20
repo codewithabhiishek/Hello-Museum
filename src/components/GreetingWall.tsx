@@ -1,10 +1,103 @@
-import { useMemo, useState } from "react";
-import { GREETINGS, REGIONS, type Region } from "../data/greetings";
-import { SectionHead, Reveal } from "./Chrome";
+import { useEffect, useMemo, useState } from "react";
+import { GREETINGS, REGIONS, type Greeting, type Region } from "../data/greetings";
+import { SectionHead, Reveal, SpeakerIcon, Asterisk } from "./Chrome";
+import { clickSound, popSound, speakGreeting } from "../sound";
+import { addHello } from "../store";
+
+function ExhibitLabel({ g, onClose, onShuffle }: { g: Greeting; onClose: () => void; onShuffle: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[80] flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${g.word} — ${g.lang} greeting`}
+    >
+      <button
+        className="absolute inset-0 bg-abyss/85"
+        onClick={onClose}
+        aria-label="Close exhibit label"
+      />
+      <article className="pop relative w-full max-w-lg border-4 border-midnight bg-sun text-midnight shadow-[14px_14px_0_rgba(255,75,46,0.45)]">
+        <button
+          onClick={onClose}
+          autoFocus
+          aria-label="Close"
+          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center border-2 border-midnight/40 font-display text-lg font-extrabold transition-all duration-150 hover:rotate-90 hover:border-midnight hover:bg-midnight hover:text-sun"
+        >
+          ✕
+        </button>
+        <div className="border-b-4 border-midnight bg-chalk px-6 py-3">
+          <p className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.35em] text-midnight/70">
+            <Asterisk className="h-3 w-3 text-signal" />
+            Exhibit label · {g.region}
+          </p>
+        </div>
+        <div className="p-6 sm:p-8">
+          <p className="font-display text-6xl font-extrabold leading-none tracking-tight sm:text-7xl">
+            {g.native ?? g.word}
+          </p>
+          {g.native && (
+            <p className="mt-2 font-display text-2xl font-bold text-midnight/80">{g.word}</p>
+          )}
+          <p className="mt-3 font-mono text-xs uppercase tracking-[0.2em] text-signal">
+            “{g.say}” · {g.lang}
+          </p>
+          {g.note ? (
+            <p className="mt-5 border-l-4 border-midnight/30 pl-4 text-[15px] italic leading-relaxed text-midnight/85">
+              {g.note}
+            </p>
+          ) : (
+            <p className="mt-5 border-l-4 border-midnight/30 pl-4 text-[15px] italic leading-relaxed text-midnight/70">
+              One of {GREETINGS.length} ways to open a door on this wall.
+            </p>
+          )}
+          <div className="mt-7 flex flex-wrap gap-3">
+            <button
+              onClick={() => {
+                clickSound();
+                speakGreeting(g);
+              }}
+              className="group flex items-center gap-2.5 bg-midnight px-5 py-3 font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-sun transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[5px_5px_0_rgba(7,11,58,0.4)]"
+            >
+              <SpeakerIcon on className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+              Hear it spoken
+            </button>
+            <button
+              onClick={onShuffle}
+              className="flex items-center gap-2.5 border-2 border-midnight px-5 py-3 font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-midnight transition-all duration-200 hover:-translate-y-0.5 hover:bg-midnight hover:text-sun"
+            >
+              Another hello
+            </button>
+          </div>
+        </div>
+      </article>
+    </div>
+  );
+}
 
 export function GreetingWall() {
   const [region, setRegion] = useState<"All" | Region>("All");
   const [query, setQuery] = useState("");
+  const [selected, setSelected] = useState<Greeting | null>(null);
+
+  const openCard = (g: Greeting) => {
+    popSound();
+    addHello(1);
+    setSelected(g);
+  };
+
+  const shuffleCard = () => {
+    popSound();
+    setSelected(GREETINGS[Math.floor(Math.random() * GREETINGS.length)]);
+  };
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -73,11 +166,35 @@ export function GreetingWall() {
           {filtered.map((g, i) => (
             <article
               key={`${g.lang}-${g.word}`}
-              className="cardin group relative flex flex-col justify-between overflow-hidden border border-chalk/15 bg-white/[0.03] p-5 transition-all duration-300 hover:-translate-y-1 hover:-rotate-1 hover:border-sun hover:bg-sun hover:text-midnight hover:shadow-[6px_6px_0_rgba(255,197,61,0.25)]"
+              onClick={() => openCard(g)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  openCard(g);
+                }
+              }}
+              tabIndex={0}
+              role="button"
+              aria-label={`Open exhibit label for ${g.word}, ${g.lang}`}
+              className="cardin group relative flex cursor-pointer flex-col justify-between overflow-hidden border border-chalk/15 bg-white/[0.03] p-5 transition-all duration-300 hover:-translate-y-1 hover:-rotate-1 hover:border-sun hover:bg-sun hover:text-midnight hover:shadow-[6px_6px_0_rgba(255,197,61,0.25)]"
               style={{ animationDelay: `${Math.min(i * 22, 500)}ms` }}
             >
-              <span className="absolute right-4 top-4 font-mono text-[10px] tracking-widest text-chalk/30 transition-colors group-hover:text-midnight/50">
-                {String(i + 1).padStart(2, "0")}
+              <span className="absolute right-4 top-4 flex items-center gap-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    clickSound();
+                    speakGreeting(g);
+                  }}
+                  aria-label={`Hear ${g.word} spoken in ${g.lang}`}
+                  title={`Hear “${g.word}”`}
+                  className="flex h-7 w-7 items-center justify-center border border-chalk/25 text-chalk/60 opacity-70 transition-all duration-200 hover:scale-110 hover:border-signal hover:text-signal group-hover:border-midnight/40 group-hover:text-midnight group-hover:opacity-100 group-hover:hover:border-midnight group-hover:hover:bg-midnight group-hover:hover:text-sun"
+                >
+                  <SpeakerIcon on className="h-3.5 w-3.5" />
+                </button>
+                <span className="font-mono text-[10px] tracking-widest text-chalk/30 transition-colors group-hover:text-midnight/50">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
               </span>
               <div className="pr-10">
                 {g.native && (
@@ -130,6 +247,14 @@ export function GreetingWall() {
           </div>
         )}
       </div>
+
+      {selected && (
+        <ExhibitLabel
+          g={selected}
+          onClose={() => setSelected(null)}
+          onShuffle={shuffleCard}
+        />
+      )}
     </section>
   );
 }

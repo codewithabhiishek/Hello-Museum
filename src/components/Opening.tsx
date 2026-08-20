@@ -1,12 +1,29 @@
-import { Marquee, RotatingBadge, WaveHand, Asterisk } from "./Chrome";
+import { Marquee, RotatingBadge, WaveHand, Asterisk, SpeakerIcon } from "./Chrome";
 import { FOYER_WORDS, GREETINGS } from "../data/greetings";
 import { useScramble } from "../hooks";
+import { clickSound, popSound, speakGreeting, tickSound } from "../sound";
+import { addHello, useHelloCount } from "../store";
 
 const WORDS = FOYER_WORDS.map((f) => f.word);
+const WORD_LANG = new Map<string, string>(FOYER_WORDS.map((f) => [f.word, f.lang]));
+WORD_LANG.set("こんにちは", "Japanese");
+WORD_LANG.set("你好", "Mandarin");
 
 export function Opening() {
-  const { display, index, advance } = useScramble(WORDS, 2500);
+  const { display, index, advance } = useScramble(WORDS, 2500, tickSound);
   const meta = FOYER_WORDS[index];
+  const hellos = useHelloCount();
+
+  const shuffle = () => {
+    popSound();
+    addHello(1);
+    advance();
+  };
+
+  const hearIt = () => {
+    clickSound();
+    speakGreeting({ word: meta.word, lang: meta.lang });
+  };
 
   return (
     <section id="top" className="relative flex min-h-screen flex-col overflow-hidden pt-16">
@@ -47,7 +64,7 @@ export function Opening() {
         {/* the word itself */}
         <div className="mt-auto">
           <button
-            onClick={() => advance()}
+            onClick={shuffle}
             title="Shuffle another hello"
             className="group block w-full text-left"
             aria-label={`Currently saying ${meta.word} in ${meta.lang}. Click for another hello.`}
@@ -60,9 +77,18 @@ export function Opening() {
 
           <div className="mt-6 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
-              <p key={index} className="pop font-mono text-sm uppercase tracking-[0.25em] text-sun">
-                {meta.lang} — “{meta.say}”
-              </p>
+              <div key={index} className="pop flex flex-wrap items-center gap-x-4 gap-y-2">
+                <p className="font-mono text-sm uppercase tracking-[0.25em] text-sun">
+                  {meta.lang} — “{meta.say}”
+                </p>
+                <button
+                  onClick={hearIt}
+                  className="inline-flex items-center gap-2 border border-sun/50 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-sun transition-all duration-200 hover:-translate-y-0.5 hover:bg-sun hover:text-midnight"
+                >
+                  <SpeakerIcon on className="h-3.5 w-3.5" />
+                  Hear it
+                </button>
+              </div>
               <p className="mt-3 max-w-xl text-base leading-relaxed text-chalk/70 sm:text-lg">
                 {GREETINGS.length} greetings hang on these walls, and not two of them
                 sound alike. Every one of them does the same impossible thing: turns
@@ -70,7 +96,7 @@ export function Opening() {
               </p>
               <p className="mt-4 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-chalk/45">
                 <WaveHand className="h-4 w-4 text-signal" />
-                Click the big word to shuffle — it speaks {FOYER_WORDS.length} languages
+                Click the big word to shuffle · “Hear it” says it out loud
               </p>
             </div>
 
@@ -82,19 +108,22 @@ export function Opening() {
           {/* museum plaque strip */}
           <div className="mt-10 grid grid-cols-2 gap-px border border-chalk/15 bg-chalk/15 md:grid-cols-4">
             {[
-              { k: "Exhibit", v: "First Words" },
-              { k: "Languages", v: `${GREETINGS.length} hellos` },
-              { k: "Admission", v: "One hello" },
-              { k: "Hours", v: "Whenever spoken" },
+              { k: "Exhibit", v: "First Words", live: false },
+              { k: "Languages", v: `${GREETINGS.length} hellos`, live: false },
+              { k: "Hellos exchanged", v: hellos.toLocaleString("en-US"), live: true },
+              { k: "Hours", v: "Whenever spoken", live: false },
             ].map((item) => (
               <div
                 key={item.k}
                 className="group bg-midnight px-4 py-4 transition-colors duration-300 hover:bg-ultramarine"
               >
-                <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-chalk/45 group-hover:text-chalk/70">
+                <p className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-chalk/45 group-hover:text-chalk/70">
+                  {item.live && (
+                    <span className="blink inline-block h-1.5 w-1.5 rounded-full bg-signal" />
+                  )}
                   {item.k}
                 </p>
-                <p className="mt-1.5 font-display text-lg font-bold text-chalk sm:text-xl">
+                <p className="mt-1.5 font-display text-lg font-bold tabular-nums text-chalk sm:text-xl">
                   {item.v}
                 </p>
               </div>
@@ -109,6 +138,11 @@ export function Opening() {
           duration={38}
           className="py-4"
           itemClassName="font-display text-3xl font-extrabold tracking-tight text-chalk/80 sm:text-4xl"
+          onWordClick={(w) => {
+            popSound();
+            addHello(1);
+            speakGreeting({ word: w, lang: WORD_LANG.get(w) ?? "English" });
+          }}
         />
       </div>
     </section>

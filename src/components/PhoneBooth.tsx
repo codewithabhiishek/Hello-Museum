@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
 import { GREETINGS } from "../data/greetings";
 import { SectionHead, Reveal } from "./Chrome";
+import { chimeSound, clickSound, ringFor, speakGreeting } from "../sound";
+import { addHello } from "../store";
 
 function RotaryPhone({ ringing }: { ringing: boolean }) {
   return (
@@ -61,8 +63,10 @@ export function PhoneBooth() {
   const [ringing, setRinging] = useState(false);
   const [bubble, setBubble] = useState("Hello!");
   const timerRef = useRef<number | null>(null);
+  const stopRingRef = useRef<(() => void) | null>(null);
 
   const pick = (s: "edison" | "bell") => {
+    clickSound();
     setSide(s);
     setBubble(s === "edison" ? "Hello!" : "Ahoy!");
   };
@@ -70,11 +74,16 @@ export function PhoneBooth() {
   const ring = () => {
     if (ringing) return;
     setRinging(true);
+    stopRingRef.current = ringFor(1400);
     if (timerRef.current) window.clearTimeout(timerRef.current);
     timerRef.current = window.setTimeout(() => {
+      stopRingRef.current?.();
       const g = GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
       setBubble(`${g.native ?? g.word}!`);
       setRinging(false);
+      chimeSound();
+      speakGreeting(g);
+      addHello(1);
     }, 1400);
   };
 

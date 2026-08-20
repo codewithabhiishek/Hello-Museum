@@ -19,7 +19,7 @@ export function usePrefersReducedMotion(): boolean {
 const POOL = "AEIOUBCDGHKLMNPRSTVWXZ*#%&?!+";
 
 /* Scramble-decode cycler for the foyer word. */
-export function useScramble(words: string[], hold = 2400) {
+export function useScramble(words: string[], hold = 2400, onTick?: () => void) {
   const reduced = usePrefersReducedMotion();
   const [display, setDisplay] = useState(words[0]);
   const [index, setIndex] = useState(0);
@@ -46,6 +46,7 @@ export function useScramble(words: string[], hold = 2400) {
       const frames = Math.max(target.length * 3, 14);
       for (let f = 0; f <= frames; f++) {
         const t = window.setTimeout(() => {
+          onTick?.();
           const locked = Math.floor((f / frames) * target.length);
           const out = target
             .split("")
@@ -60,7 +61,7 @@ export function useScramble(words: string[], hold = 2400) {
       const done = window.setTimeout(() => setDisplay(target), frames * 26 + 40);
       timersRef.current.push(done);
     },
-    [words, reduced],
+    [words, reduced, onTick],
   );
 
   useEffect(() => {

@@ -1,6 +1,9 @@
-import { useEffect, useState, type ReactNode } from "react";
-import { useInView } from "../hooks";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import confetti from "canvas-confetti";
+import { useInView, usePrefersReducedMotion } from "../hooks";
 import { MARQUEE_WORDS } from "../data/greetings";
+import { clickSound, chimeSound, toggleMuted, useSoundEnabled } from "../sound";
+import { addHello, useHelloCount } from "../store";
 
 /* ---------- small custom SVG marks ---------- */
 
@@ -72,17 +75,30 @@ export function Marquee({
   duration = 32,
   className = "",
   itemClassName = "",
+  onWordClick,
 }: {
   words?: string[];
   duration?: number;
   className?: string;
   itemClassName?: string;
+  onWordClick?: (word: string) => void;
 }) {
   const group = (hidden: boolean) => (
     <div className="flex shrink-0 items-center" aria-hidden={hidden || undefined}>
       {words.map((w, i) => (
         <span key={`${w}-${i}`} className={`flex items-center ${itemClassName}`}>
-          <span className="whitespace-nowrap">{w}</span>
+          {onWordClick ? (
+            <button
+              onClick={() => onWordClick(w)}
+              tabIndex={hidden ? -1 : 0}
+              title={`Say ${w}`}
+              className="whitespace-nowrap transition-all duration-200 hover:-translate-y-0.5 hover:text-sun focus-visible:text-sun"
+            >
+              {w}
+            </button>
+          ) : (
+            <span className="whitespace-nowrap">{w}</span>
+          )}
           <Asterisk className="mx-5 h-[0.55em] w-[0.55em] shrink-0 opacity-60" />
         </span>
       ))}
@@ -184,8 +200,38 @@ function useDayGreeting() {
   return label;
 }
 
+export function SpeakerIcon({ on, className = "" }: { on: boolean; className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path
+        d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+      {on ? (
+        <path
+          d="M15.5 9.5a3.5 3.5 0 0 1 0 5M18 7a7 7 0 0 1 0 10"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
+      ) : (
+        <path
+          d="M15.5 9.5l5 5M20.5 9.5l-5 5"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
+      )}
+    </svg>
+  );
+}
+
 export function Header() {
   const greeting = useDayGreeting();
+  const soundOn = useSoundEnabled();
+  const hellos = useHelloCount();
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-chalk/10 bg-midnight/80 backdrop-blur-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
@@ -208,12 +254,109 @@ export function Header() {
             </a>
           ))}
         </nav>
-        <p className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-sun">
-          <span className="blink inline-block h-2 w-2 rounded-full bg-signal" />
-          {greeting} — open now
-        </p>
+        <div className="flex items-center gap-3 sm:gap-4">
+          <p className="hidden items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-sun xl:flex">
+            <span className="blink inline-block h-2 w-2 rounded-full bg-signal" />
+            {greeting} — open now
+          </p>
+          <p
+            className="hidden items-center gap-2 border border-chalk/20 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-chalk/70 sm:flex"
+            title="Hellos exchanged by visitors, all time"
+          >
+            <Asterisk className="h-3 w-3 text-sun" />
+            <span className="tabular-nums text-sun">{hellos.toLocaleString("en-US")}</span>
+            hellos
+          </p>
+          <button
+            onClick={() => {
+              const turningOn = !soundOn;
+              toggleMuted();
+              if (turningOn) clickSound();
+            }}
+            aria-pressed={soundOn}
+            title={soundOn ? "Mute the museum" : "Unmute the museum"}
+            className={`flex h-9 w-9 items-center justify-center border transition-all duration-200 hover:-translate-y-0.5 ${
+              soundOn
+                ? "border-sun/60 text-sun hover:bg-sun hover:text-midnight"
+                : "border-chalk/25 text-chalk/50 hover:border-chalk/60 hover:text-chalk"
+            }`}
+          >
+            <SpeakerIcon on={soundOn} className="h-5 w-5" />
+            <span className="sr-only">{soundOn ? "Sound is on" : "Sound is off"}</span>
+          </button>
+        </div>
       </div>
     </header>
+  );
+}
+
+/* ---------- cursor spotlight ---------- */
+
+export function Spotlight() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    let raf = 0;
+    const move = (e: PointerEvent) => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        el.style.background = `radial-gradient(540px circle at ${e.clientX}px ${e.clientY}px, rgba(155,165,255,0.10), rgba(255,197,61,0.04) 40%, transparent 68%)`;
+      });
+    };
+    window.addEventListener("pointermove", move, { passive: true });
+    return () => {
+      window.removeEventListener("pointermove", move);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+  return <div ref={ref} className="pointer-events-none fixed inset-0 z-[45]" aria-hidden="true" />;
+}
+
+/* ---------- keyboard easter egg: type "hello" anywhere ---------- */
+
+export function EasterEgg() {
+  const reduced = usePrefersReducedMotion();
+  const [toast, setToast] = useState(false);
+  const buf = useRef("");
+  const timer = useRef(0);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      if (!/^[a-zA-Z]$/.test(e.key)) return;
+      buf.current = (buf.current + e.key.toLowerCase()).slice(-5);
+      if (buf.current !== "hello") return;
+      buf.current = "";
+      addHello(5);
+      chimeSound();
+      if (!reduced) {
+        confetti({
+          particleCount: 110,
+          spread: 78,
+          origin: { y: 0.35 },
+          colors: ["#ffc53d", "#ff4b2e", "#f4f0e4", "#9ba5ff"],
+        });
+      }
+      setToast(true);
+      window.clearTimeout(timer.current);
+      timer.current = window.setTimeout(() => setToast(false), 3200);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.clearTimeout(timer.current);
+    };
+  }, [reduced]);
+  if (!toast) return null;
+  return (
+    <div className="fixed bottom-6 left-1/2 z-[90] -translate-x-1/2">
+      <div className="pop border-2 border-sun bg-midnight px-6 py-3 shadow-[6px_6px_0_rgba(255,75,46,0.5)]">
+        <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-sun">
+          The museum heard you — +5 hellos
+        </p>
+      </div>
+    </div>
   );
 }
 
