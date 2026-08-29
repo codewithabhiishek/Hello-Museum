@@ -26,19 +26,19 @@ function ExhibitLabel({ g, onClose, onShuffle }: { g: Greeting; onClose: () => v
         aria-label="Close exhibit label"
       />
       <article className="pop relative w-full max-w-lg border-4 border-midnight bg-sun text-midnight shadow-[14px_14px_0_rgba(255,75,46,0.45)]">
-        <button
-          onClick={onClose}
-          autoFocus
-          aria-label="Close exhibit label"
-          className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center border-2 border-midnight/40 text-midnight/70 transition-all duration-150 hover:rotate-90 hover:border-midnight hover:bg-midnight hover:text-sun active:scale-95"
-        >
-          <CloseIcon className="h-5 w-5" />
-        </button>
-        <div className="border-b-4 border-midnight bg-chalk px-6 py-3">
-          <p className="flex max-w-[calc(100%-3rem)] items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-midnight/70">
+        <div className="flex items-center justify-between border-b-4 border-midnight bg-chalk px-4 py-2.5 sm:px-6">
+          <p className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-midnight/70">
             <Asterisk className="h-3 w-3 shrink-0 text-signal" />
             <span className="truncate">Exhibit label · {g.region}</span>
           </p>
+          <button
+            onClick={onClose}
+            autoFocus
+            aria-label="Close exhibit label"
+            className="flex h-8 w-8 items-center justify-center border-2 border-midnight/40 text-midnight/70 transition-all duration-150 hover:rotate-90 hover:border-midnight hover:bg-midnight hover:text-sun active:scale-95"
+          >
+            <CloseIcon className="h-4 w-4" />
+          </button>
         </div>
         <div className="p-6 sm:p-8">
           <p className="break-words font-display text-[clamp(2.3rem,9vw,4.25rem)] font-extrabold leading-[0.98] tracking-tight">
