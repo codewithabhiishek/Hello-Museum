@@ -34,6 +34,19 @@ export function WaveHand({ className = "" }: { className?: string }) {
   );
 }
 
+export function CloseIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path
+        d="M6 6l12 12M18 6L6 18"
+        stroke="currentColor"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 export function StampMark({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 44 44" fill="none" className={className} aria-hidden="true">
@@ -179,12 +192,65 @@ export function SectionHead({
 /* ---------- header ---------- */
 
 const NAV = [
-  { href: "#wall", label: "The Wall" },
-  { href: "#anatomy", label: "Anatomy" },
-  { href: "#booth", label: "Phone Booth" },
-  { href: "#notes", label: "Field Notes" },
-  { href: "#ticket", label: "Take One Home" },
+  { href: "#wall", id: "wall", label: "The Wall" },
+  { href: "#anatomy", id: "anatomy", label: "Anatomy" },
+  { href: "#booth", id: "booth", label: "Phone Booth" },
+  { href: "#notes", id: "notes", label: "Field Notes" },
+  { href: "#ticket", id: "ticket", label: "Take One Home" },
 ];
+
+const NAV_IDS = NAV.map((n) => n.id);
+
+function useScrollSpy(ids: string[]): string {
+  const [active, setActive] = useState("");
+  useEffect(() => {
+    const els = ids
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+    if (els.length === 0) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (visible[0]) setActive(visible[0].target.id);
+      },
+      { rootMargin: "-35% 0px -55% 0px", threshold: [0, 0.1, 0.4] },
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [ids]);
+  return active;
+}
+
+function ScrollProgress() {
+  const ref = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const onScroll = () => {
+      const el = ref.current;
+      if (!el) return;
+      const doc = document.documentElement;
+      const max = doc.scrollHeight - window.innerHeight;
+      const p = max > 0 ? Math.min(Math.max(window.scrollY / max, 0), 1) : 0;
+      el.style.transform = `scaleX(${p})`;
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+  return (
+    <div
+      ref={ref}
+      className="fixed left-0 top-0 z-[55] h-[3px] w-full origin-left bg-sun"
+      style={{ transform: "scaleX(0)" }}
+      aria-hidden="true"
+    />
+  );
+}
 
 function useDayGreeting() {
   const [label, setLabel] = useState("Good day");
@@ -232,61 +298,95 @@ export function Header() {
   const greeting = useDayGreeting();
   const soundOn = useSoundEnabled();
   const hellos = useHelloCount();
+  const active = useScrollSpy(NAV_IDS);
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-chalk/10 bg-midnight/80 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-        <a href="#top" className="group flex items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center bg-ultramarine font-display text-lg font-extrabold text-sun transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-105">
-            H
-          </span>
-          <span className="font-display text-sm font-bold uppercase tracking-[0.18em] text-chalk">
-            Hello Museum
-          </span>
-        </a>
-        <nav className="hidden items-center gap-6 lg:flex">
-          {NAV.map((n) => (
-            <a
-              key={n.href}
-              href={n.href}
-              className="link-line font-mono text-[11px] uppercase tracking-[0.22em] text-chalk/70 transition-colors hover:text-chalk"
-            >
-              {n.label}
+    <>
+      <ScrollProgress />
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-chalk/10 bg-midnight/85 backdrop-blur-sm">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="flex items-center justify-between gap-3 py-3">
+            <a href="#top" className="group flex shrink-0 items-center gap-2.5">
+              <span className="flex h-9 w-9 items-center justify-center bg-ultramarine font-display text-lg font-extrabold text-sun transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-105">
+                H
+              </span>
+              <span className="hidden font-display text-sm font-bold uppercase tracking-[0.18em] text-chalk min-[420px]:inline">
+                Hello Museum
+              </span>
             </a>
-          ))}
-        </nav>
-        <div className="flex items-center gap-3 sm:gap-4">
-          <p className="hidden items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-sun xl:flex">
-            <span className="blink inline-block h-2 w-2 rounded-full bg-signal" />
-            {greeting} — open now
-          </p>
-          <p
-            className="hidden items-center gap-2 border border-chalk/20 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-chalk/70 sm:flex"
-            title="Hellos exchanged by visitors, all time"
+
+            <nav className="hidden items-center gap-6 lg:flex" aria-label="Halls">
+              {NAV.map((n) => (
+                <a
+                  key={n.href}
+                  href={n.href}
+                  aria-current={active === n.id ? "true" : undefined}
+                  className={`link-line font-mono text-[11px] uppercase tracking-[0.22em] transition-colors ${
+                    active === n.id ? "text-sun" : "text-chalk/70 hover:text-chalk"
+                  }`}
+                >
+                  {n.label}
+                </a>
+              ))}
+            </nav>
+
+            <div className="flex items-center gap-2 sm:gap-3">
+              <p className="hidden items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-chalk/50 xl:flex">
+                <span className="blink inline-block h-2 w-2 rounded-full bg-signal" />
+                {greeting} — open now
+              </p>
+              <p
+                className="hidden items-center gap-2 border border-chalk/20 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-chalk/70 min-[420px]:flex"
+                title="Hellos exchanged by visitors, all time"
+              >
+                <Asterisk className="h-3 w-3 text-sun" />
+                <span className="tabular-nums text-sun">
+                  {hellos.toLocaleString("en-US")}
+                </span>
+                hellos
+              </p>
+              <button
+                onClick={() => {
+                  const turningOn = !soundOn;
+                  toggleMuted();
+                  if (turningOn) clickSound();
+                }}
+                aria-pressed={soundOn}
+                title={soundOn ? "Mute the museum" : "Unmute the museum"}
+                className={`flex h-9 w-9 shrink-0 items-center justify-center border transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 ${
+                  soundOn
+                    ? "border-sun/60 text-sun hover:bg-sun hover:text-midnight"
+                    : "border-chalk/25 text-chalk/50 hover:border-chalk/60 hover:text-chalk"
+                }`}
+              >
+                <SpeakerIcon on={soundOn} className="h-5 w-5" />
+                <span className="sr-only">{soundOn ? "Sound is on" : "Sound is off"}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* mobile / tablet nav */}
+          <nav
+            className="-mx-1 flex items-center gap-1.5 overflow-x-auto pb-2.5 [scrollbar-width:none] lg:hidden [&::-webkit-scrollbar]:hidden"
+            aria-label="Halls"
           >
-            <Asterisk className="h-3 w-3 text-sun" />
-            <span className="tabular-nums text-sun">{hellos.toLocaleString("en-US")}</span>
-            hellos
-          </p>
-          <button
-            onClick={() => {
-              const turningOn = !soundOn;
-              toggleMuted();
-              if (turningOn) clickSound();
-            }}
-            aria-pressed={soundOn}
-            title={soundOn ? "Mute the museum" : "Unmute the museum"}
-            className={`flex h-9 w-9 items-center justify-center border transition-all duration-200 hover:-translate-y-0.5 ${
-              soundOn
-                ? "border-sun/60 text-sun hover:bg-sun hover:text-midnight"
-                : "border-chalk/25 text-chalk/50 hover:border-chalk/60 hover:text-chalk"
-            }`}
-          >
-            <SpeakerIcon on={soundOn} className="h-5 w-5" />
-            <span className="sr-only">{soundOn ? "Sound is on" : "Sound is off"}</span>
-          </button>
+            {NAV.map((n) => (
+              <a
+                key={n.href}
+                href={n.href}
+                aria-current={active === n.id ? "true" : undefined}
+                className={`whitespace-nowrap border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] transition-colors ${
+                  active === n.id
+                    ? "border-sun bg-sun text-midnight"
+                    : "border-chalk/20 text-chalk/70 hover:border-chalk/50 hover:text-chalk"
+                }`}
+              >
+                {n.label}
+              </a>
+            ))}
+          </nav>
         </div>
-      </div>
-    </header>
+      </header>
+    </>
   );
 }
 

@@ -57,12 +57,10 @@ export function Numbers() {
   return (
     <section
       id="numbers"
-      className="relative scroll-mt-20 overflow-hidden bg-chalk px-4 py-20 text-midnight sm:px-6 md:py-28"
+      className="relative scroll-mt-32 overflow-hidden bg-chalk px-4 py-20 text-midnight sm:px-6 md:py-28 lg:scroll-mt-24"
     >
       <div className="bg-dots-ink pointer-events-none absolute inset-0 opacity-40" aria-hidden="true" />
-      <Asterisk
-        className="pointer-events-none absolute -right-16 -top-16 h-72 w-72 text-signal/15"
-      />
+      <Asterisk className="pointer-events-none absolute -right-16 -top-16 hidden h-72 w-72 text-signal/15 md:block" />
 
       <div className="relative mx-auto max-w-7xl">
         <Reveal className="mb-12 md:mb-16">

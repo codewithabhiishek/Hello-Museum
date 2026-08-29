@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { GREETINGS, REGIONS, type Greeting, type Region } from "../data/greetings";
-import { SectionHead, Reveal, SpeakerIcon, Asterisk } from "./Chrome";
+import { SectionHead, Reveal, SpeakerIcon, Asterisk, CloseIcon } from "./Chrome";
 import { clickSound, popSound, speakGreeting } from "../sound";
 import { addHello } from "../store";
 
@@ -29,23 +29,25 @@ function ExhibitLabel({ g, onClose, onShuffle }: { g: Greeting; onClose: () => v
         <button
           onClick={onClose}
           autoFocus
-          aria-label="Close"
-          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center border-2 border-midnight/40 font-display text-lg font-extrabold transition-all duration-150 hover:rotate-90 hover:border-midnight hover:bg-midnight hover:text-sun"
+          aria-label="Close exhibit label"
+          className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center border-2 border-midnight/40 text-midnight/70 transition-all duration-150 hover:rotate-90 hover:border-midnight hover:bg-midnight hover:text-sun active:scale-95"
         >
-          ✕
+          <CloseIcon className="h-5 w-5" />
         </button>
         <div className="border-b-4 border-midnight bg-chalk px-6 py-3">
-          <p className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.35em] text-midnight/70">
-            <Asterisk className="h-3 w-3 text-signal" />
-            Exhibit label · {g.region}
+          <p className="flex max-w-[calc(100%-3rem)] items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-midnight/70">
+            <Asterisk className="h-3 w-3 shrink-0 text-signal" />
+            <span className="truncate">Exhibit label · {g.region}</span>
           </p>
         </div>
         <div className="p-6 sm:p-8">
-          <p className="font-display text-6xl font-extrabold leading-none tracking-tight sm:text-7xl">
+          <p className="break-words font-display text-[clamp(2.3rem,9vw,4.25rem)] font-extrabold leading-[0.98] tracking-tight">
             {g.native ?? g.word}
           </p>
           {g.native && (
-            <p className="mt-2 font-display text-2xl font-bold text-midnight/80">{g.word}</p>
+            <p className="mt-2 break-words font-display text-2xl font-bold text-midnight/80">
+              {g.word}
+            </p>
           )}
           <p className="mt-3 font-mono text-xs uppercase tracking-[0.2em] text-signal">
             “{g.say}” · {g.lang}
@@ -114,7 +116,7 @@ export function GreetingWall() {
   }, [region, query]);
 
   return (
-    <section id="wall" className="relative scroll-mt-20 px-4 py-20 sm:px-6 md:py-28">
+    <section id="wall" className="relative scroll-mt-32 px-4 py-20 sm:px-6 md:py-28 lg:scroll-mt-24">
       <div className="mx-auto max-w-7xl">
         <SectionHead
           hall="Hall 02 — The Wall"
@@ -132,7 +134,7 @@ export function GreetingWall() {
                 <button
                   key={r}
                   onClick={() => setRegion(r)}
-                  className={`group flex items-center gap-2 border px-4 py-2 font-mono text-[11px] uppercase tracking-[0.18em] transition-all duration-200 ${
+                  className={`group flex items-center gap-2 border-2 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.18em] transition-all duration-200 active:scale-95 ${
                     active
                       ? "border-sun bg-sun text-midnight"
                       : "border-chalk/20 text-chalk/70 hover:-translate-y-0.5 hover:border-chalk/60 hover:text-chalk"
@@ -154,7 +156,7 @@ export function GreetingWall() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search a language…"
-              className="w-full border border-chalk/20 bg-transparent px-4 py-2.5 font-mono text-sm text-chalk placeholder:text-chalk/35 focus:border-sun"
+              className="w-full border-2 border-chalk/20 bg-transparent px-4 py-2.5 font-mono text-sm text-chalk placeholder:text-chalk/35 focus:border-sun"
             />
             <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 font-mono text-[10px] uppercase tracking-widest text-chalk/35">
               {filtered.length} found
@@ -162,7 +164,10 @@ export function GreetingWall() {
           </label>
         </Reveal>
 
-        <div key={`${region}-${query}`} className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div
+          key={`${region}-${query}`}
+          className="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4"
+        >
           {filtered.map((g, i) => (
             <article
               key={`${g.lang}-${g.word}`}
@@ -198,12 +203,12 @@ export function GreetingWall() {
               </span>
               <div className="pr-10">
                 {g.native && (
-                  <p className="font-display text-[26px] font-extrabold leading-tight">
+                  <p className="break-words font-display text-[26px] font-extrabold leading-tight">
                     {g.native}
                   </p>
                 )}
                 <p
-                  className={`font-display text-[26px] font-extrabold leading-tight ${
+                  className={`break-words font-display text-[26px] font-extrabold leading-tight ${
                     g.native ? "mt-1 text-base font-bold text-chalk/70 transition-colors group-hover:text-midnight/80" : ""
                   }`}
                 >

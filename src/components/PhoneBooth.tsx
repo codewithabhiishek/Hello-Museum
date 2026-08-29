@@ -88,7 +88,7 @@ export function PhoneBooth() {
   };
 
   return (
-    <section id="booth" className="relative scroll-mt-20 px-4 py-20 sm:px-6 md:py-28">
+    <section id="booth" className="relative scroll-mt-32 px-4 py-20 sm:px-6 md:py-28 lg:scroll-mt-24">
       <div className="mx-auto max-w-7xl">
         <SectionHead
           hall="Hall 04 — The Phone Booth"
@@ -158,7 +158,7 @@ export function PhoneBooth() {
               className={`mt-6 w-full border-2 px-6 py-4 font-mono text-sm uppercase tracking-[0.3em] transition-all duration-200 ${
                 ringing
                   ? "cursor-wait border-signal/60 bg-signal/15 text-signal"
-                  : "border-signal text-signal hover:-translate-y-0.5 hover:bg-signal hover:text-chalk hover:shadow-[6px_6px_0_rgba(255,197,61,0.35)]"
+                  : "border-signal text-signal hover:-translate-y-0.5 hover:bg-signal hover:text-chalk hover:shadow-[6px_6px_0_rgba(255,197,61,0.35)] active:translate-y-0 active:scale-[0.99]"
               }`}
             >
               {ringing ? "· · · ringing · · ·" : "Ring the operator"}
@@ -169,33 +169,35 @@ export function PhoneBooth() {
           </Reveal>
 
           <Reveal delay={120}>
-            <div className="relative mx-auto w-full max-w-md border-4 border-chalk/20 bg-inkdeep/70 p-6 pt-14 shadow-[10px_10px_0_rgba(7,11,58,0.8)]">
+            <div className="relative mx-auto w-full max-w-md border-4 border-chalk/20 bg-inkdeep/70 p-5 pt-14 shadow-[10px_10px_0_rgba(7,11,58,0.8)] sm:p-6 sm:pt-14">
               {/* booth sign */}
               <div className="absolute inset-x-0 top-0 flex items-center justify-center bg-signal py-2">
                 <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.5em] text-chalk">
                   Telephone
                 </p>
               </div>
-              <span className="absolute -left-3 top-20 -rotate-90 font-mono text-[10px] uppercase tracking-[0.35em] text-chalk/40">
+              <span className="absolute -left-3 top-24 hidden -rotate-90 font-mono text-[10px] uppercase tracking-[0.35em] text-chalk/40 sm:block">
                 Est. 1878
               </span>
 
-              {/* speech bubble */}
-              <div
-                key={`${bubble}-${ringing}`}
-                className={`pop absolute -right-3 top-10 z-10 max-w-[60%] bg-sun px-4 py-3 text-midnight shadow-[5px_5px_0_rgba(7,11,58,0.9)] sm:-right-8 ${ringing ? "opacity-0" : ""}`}
-              >
-                <p className="font-display text-xl font-extrabold leading-tight sm:text-2xl">
-                  {bubble}
-                </p>
-                <span className="absolute -bottom-2 left-6 h-4 w-4 rotate-45 bg-sun" />
+              {/* speech bubble — contained inside the booth */}
+              <div className="relative flex min-h-[72px] items-start justify-end sm:min-h-[80px]">
+                <div
+                  key={`${bubble}-${ringing}`}
+                  className={`pop relative mr-1 max-w-[72%] bg-sun px-4 py-3 text-midnight shadow-[5px_5px_0_rgba(7,11,58,0.9)] ${ringing ? "opacity-0" : ""}`}
+                >
+                  <p className="break-words font-display text-lg font-extrabold leading-tight sm:text-2xl">
+                    {bubble}
+                  </p>
+                  <span className="absolute -bottom-2 left-6 h-4 w-4 rotate-45 bg-sun" aria-hidden="true" />
+                </div>
               </div>
 
-              <div className={`aspect-[6/5] text-chalk ${ringing ? "ringing" : ""}`}>
+              <div className={`aspect-[6/5] w-full text-chalk ${ringing ? "ringing" : ""}`}>
                 <RotaryPhone ringing={ringing} />
               </div>
 
-              <p className="mt-4 border-t border-chalk/15 pt-4 text-center font-mono text-[10px] uppercase tracking-[0.3em] text-chalk/50">
+              <p className="mt-4 border-t border-chalk/15 pt-4 text-center font-mono text-[10px] uppercase tracking-[0.25em] text-chalk/50">
                 {ringing
                   ? "Connecting…"
                   : side === "edison"

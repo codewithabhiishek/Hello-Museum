@@ -22,7 +22,11 @@ function rollTicket(): TicketData {
 function Barcode({ bars }: { bars: number[] }) {
   let x = 0;
   return (
-    <svg viewBox={`0 0 ${bars.reduce((a, b) => a + b + 1.5, 0)} 24`} className="h-8 w-36 text-midnight" aria-hidden="true">
+    <svg
+      viewBox={`0 0 ${bars.reduce((a, b) => a + b + 1.5, 0)} 24`}
+      className="h-6 w-20 shrink-0 text-midnight sm:h-8 sm:w-36"
+      aria-hidden="true"
+    >
       {bars.map((w, i) => {
         const rect = <rect key={i} x={x} y="0" width={w} height="24" fill="currentColor" />;
         x += w + 1.5;
@@ -57,10 +61,10 @@ export function Ticket() {
   };
 
   return (
-    <section id="ticket" className="relative scroll-mt-20 px-4 py-20 sm:px-6 md:py-28">
-      <div className="pointer-events-none absolute inset-0 select-none overflow-hidden" aria-hidden="true">
+    <section id="ticket" className="relative scroll-mt-32 overflow-hidden px-4 py-20 sm:px-6 md:py-28 lg:scroll-mt-24">
+      <div className="pointer-events-none absolute inset-0 hidden select-none md:block" aria-hidden="true">
         <span
-          className="float-slow absolute -left-8 bottom-0 font-display text-[24vw] font-extrabold leading-none text-stroke-faint"
+          className="float-slow absolute -left-16 bottom-0 font-display text-[18vw] font-extrabold leading-none text-stroke-faint opacity-70"
           style={{ ["--rot" as string]: "-8deg" }}
         >
           ciao
@@ -89,12 +93,12 @@ export function Ticket() {
                   onChange={(e) => setName(e.target.value)}
                   maxLength={28}
                   placeholder="Who are you greeting?"
-                  className="w-full border border-chalk/25 bg-transparent px-4 py-3.5 font-mono text-sm text-chalk placeholder:text-chalk/35 focus:border-sun"
+                  className="w-full border-2 border-chalk/25 bg-transparent px-4 py-3.5 font-mono text-sm text-chalk placeholder:text-chalk/35 focus:border-sun"
                 />
               </label>
               <button
                 type="submit"
-                className="group flex items-center justify-center gap-3 bg-sun px-6 py-3.5 font-mono text-xs font-semibold uppercase tracking-[0.25em] text-midnight transition-all duration-200 hover:-translate-y-0.5 hover:bg-chalk hover:shadow-[6px_6px_0_rgba(255,75,46,0.5)]"
+                className="group flex items-center justify-center gap-3 bg-sun px-6 py-3.5 font-mono text-xs font-semibold uppercase tracking-[0.25em] text-midnight transition-all duration-200 hover:-translate-y-0.5 hover:bg-chalk hover:shadow-[6px_6px_0_rgba(255,75,46,0.5)] active:translate-y-0 active:scale-[0.98]"
               >
                 <WaveHand className="h-4 w-4 transition-transform duration-300 group-hover:rotate-12" />
                 Print my hello
@@ -131,7 +135,7 @@ export function Ticket() {
                           <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-midnight/60">
                             The Museum of First Words
                           </p>
-                          <p className="mt-3 font-display text-4xl font-extrabold leading-none sm:text-5xl">
+                          <p className="mt-3 break-words font-display text-3xl font-extrabold leading-none sm:text-5xl">
                             {ticket.greeting.native ?? ticket.greeting.word}
                           </p>
                           {ticket.greeting.native && (

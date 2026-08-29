@@ -12,7 +12,7 @@ const OFFSETS = ["lg:mt-0", "lg:mt-14", "lg:mt-6", "lg:mt-10", "lg:mt-0", "lg:mt
 
 export function FieldNotes() {
   return (
-    <section id="notes" className="relative scroll-mt-20 px-4 py-20 sm:px-6 md:py-28">
+    <section id="notes" className="relative scroll-mt-32 px-4 py-20 sm:px-6 md:py-28 lg:scroll-mt-24">
       <div className="mx-auto max-w-7xl">
         <SectionHead
           hall="Hall 05 — Field Notes"

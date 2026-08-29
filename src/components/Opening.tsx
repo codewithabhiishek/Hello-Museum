@@ -26,23 +26,23 @@ export function Opening() {
   };
 
   return (
-    <section id="top" className="relative flex min-h-screen flex-col overflow-hidden pt-16">
-      {/* ambient oversized letters */}
-      <div className="pointer-events-none absolute inset-0 select-none" aria-hidden="true">
+    <section id="top" className="relative flex min-h-screen flex-col overflow-hidden pt-28 lg:pt-16">
+      {/* ambient oversized letters — desktop only, kept clear of the reading column */}
+      <div className="pointer-events-none absolute inset-0 hidden select-none md:block" aria-hidden="true">
         <span
-          className="float-slow absolute -left-10 top-24 font-display text-[38vw] font-extrabold leading-none text-stroke-faint"
+          className="float-slow absolute -left-24 top-40 font-display text-[34vw] font-extrabold leading-none text-stroke-faint opacity-70"
           style={{ ["--rot" as string]: "-6deg" }}
         >
           H
         </span>
         <span
-          className="float-slow absolute -bottom-24 -right-6 font-display text-[30vw] font-extrabold leading-none text-stroke-faint"
+          className="float-slow absolute -bottom-28 -right-16 font-display text-[26vw] font-extrabold leading-none text-stroke-faint opacity-70"
           style={{ ["--rot" as string]: "8deg", animationDelay: "1.2s" }}
         >
           !
         </span>
         <span
-          className="float-slow absolute right-[18%] top-10 hidden font-display text-[11vw] font-extrabold leading-none text-stroke-faint lg:block"
+          className="float-slow absolute right-[16%] top-12 hidden font-display text-[9vw] font-extrabold leading-none text-stroke-faint opacity-70 xl:block"
           style={{ ["--rot" as string]: "12deg", animationDelay: "2.1s" }}
         >
           hola
@@ -56,7 +56,7 @@ export function Opening() {
             <Asterisk className="h-4 w-4 text-sun" />
             Hall 01 — The Foyer
           </p>
-          <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-chalk/50">
+          <p className="hidden font-mono text-[11px] uppercase tracking-[0.25em] text-chalk/50 sm:block">
             A museum of first words · Permanent collection
           </p>
         </div>

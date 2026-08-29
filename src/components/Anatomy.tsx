@@ -17,10 +17,10 @@ const DOT: Record<string, string> = {
 
 export function Anatomy() {
   return (
-    <section id="anatomy" className="relative scroll-mt-20 overflow-hidden px-4 py-20 sm:px-6 md:py-28">
-      <div className="pointer-events-none absolute inset-0 select-none" aria-hidden="true">
+    <section id="anatomy" className="relative scroll-mt-32 overflow-hidden px-4 py-20 sm:px-6 md:py-28 lg:scroll-mt-24">
+      <div className="pointer-events-none absolute inset-0 hidden select-none md:block" aria-hidden="true">
         <span
-          className="float-slow absolute -right-16 top-32 font-display text-[26vw] font-extrabold leading-none text-stroke-faint"
+          className="float-slow absolute -right-20 top-40 font-display text-[18vw] font-extrabold leading-none text-stroke-faint opacity-70"
           style={{ ["--rot" as string]: "10deg" }}
         >
           1827
