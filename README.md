@@ -3,7 +3,7 @@
 <div align="center">
   <img src="https://capsule-render.vercel.app/api?type=waving&color=131b23&text=HELLO%20%C2%B7%20MUSEUM%20OF%20FIRST%20WORDS&height=200&fontSize=38&fontColor=fff275&stroke=fff275&strokeWidth=2&desc=AN%20INTERACTIVE%20EXHIBITION%20OF%20HUMAN%20GREETINGS%20%C2%B7%20120%2B%20LANGUAGES&descAlignY=66&descColor=ff4b2e" width="100%" alt="Hello Museum Header"/>
   <br/>
-  <img src="https://readme-typing-svg.demolab.com?font=Cinzel&pause=1000&color=FFF275&center=true&vCenter=true&width=500&lines=Welcome+to+the+Museum+of+First+Words;120%2B+Authentic+Global+Greetings+%26+Pronunciations;Interactive+Linguistics+Gallery+%C2%B7+Rotary+Phone+Booth;Historical+Etymology%2C+Phonetics+%26+Cultural+Trivia;Built+with+React+18%2C+TypeScript+%26+Tailwind+CSS" alt="Typing SVG"/>
+  <img src="https://readme-typing-svg.demolab.com?font=Cinzel&size=16&pause=1000&color=FFF275&center=true&vCenter=true&width=620&lines=Welcome+to+the+Museum+of+First+Words;120%2B+Authentic+Global+Greetings+%26+Pronunciations;Interactive+Linguistics+Gallery+%C2%B7+Rotary+Phone+Booth;Historical+Etymology%2C+Phonetics+%26+Cultural+Trivia;Built+with+React+18%2C+TypeScript+%26+Tailwind+CSS" alt="Typing SVG"/>
   <br/>
 
   [![React](https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
