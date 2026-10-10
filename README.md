@@ -69,8 +69,14 @@ npm run dev
 ```
 Open **[http://localhost:5173](http://localhost:5173)** to explore the museum.
 
-### 3. Production Build
+### 3. Run Automated Tests
 ```bash
+npm test
+```
+
+### 4. Production Build & Typecheck
+```bash
+npm run typecheck
 npm run build
 ```
 
@@ -79,10 +85,18 @@ npm run build
 ## 🛠️ Architecture & Technologies
 
 - **UI Framework**: [React 18](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
-- **Build Engine**: [Vite 6](https://vitejs.dev/) with lightning-fast HMR
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) with custom brutalist editorial typography and color tokens (`sun`, `signal`, `chalk`, `midnight`)
-- **Audio Engine**: Web Speech Synthesis API + Synthesized Web Audio oscillator FX
-- **State Management**: Reactive Zustand / custom React hook pipeline
+- **Build Engine**: [Vite 6](https://vitejs.dev/) with optimized modular vendor chunking
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) with frosted museum glass placards, brutalist editorial typography, and cyber token accents
+- **Audio & Haptic Engine**: Web Speech Synthesis API + Synthesized Web Audio API oscillators + tactile haptic feedback (`navigator.vibrate`)
+- **Security & Quality**: 0 npm vulnerabilities (`npm audit` clean), Strix dual-honeypot form protection, and automated Node test suite
+
+---
+
+## 👨‍💻 Curator & Author
+
+Curated and built by **[Abhishek](https://abhiishek.is-a.dev/)**.
+
+Portfolio: [https://abhiishek.is-a.dev/](https://abhiishek.is-a.dev/)
 
 ---
 
@@ -102,5 +116,6 @@ Know a dialect or regional greeting that belongs in the museum? Contributions ar
 Distributed under the **MIT License**. Free for educational and creative use.
 
 <div align="center">
-  <sub>Curated with ❤️ for world linguistics · The Museum of First Words</sub>
+  <sub>Curated with ❤️ by <a href="https://abhiishek.is-a.dev/">Abhishek</a> · The Museum of First Words</sub>
 </div>
+

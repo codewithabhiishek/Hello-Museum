@@ -40,10 +40,21 @@ export function Ticket() {
   const [name, setName] = useState("");
   const [ticket, setTicket] = useState<TicketData | null>(null);
   const [stampKey, setStampKey] = useState(0);
+  const [copied, setCopied] = useState(false);
+  const [coolingDown, setCoolingDown] = useState(false);
   const reduced = usePrefersReducedMotion();
+
+  // Defensive bot & speed-trap states
+  const [botcheck, setBotcheck] = useState(false);
+  const [gotcha, setGotcha] = useState("");
 
   const issue = (e?: FormEvent) => {
     e?.preventDefault();
+    // Strix Honeypot Defense: Silently drop if bot traps are tripped
+    if (botcheck || gotcha.trim().length > 0) return;
+    if (coolingDown) return;
+
+    setCoolingDown(true);
     setTicket(rollTicket());
     setStampKey((k) => k + 1);
     stampSound();
@@ -57,6 +68,25 @@ export function Ticket() {
         origin: { x: 0.7, y: 0.6 },
         colors: ["#ffc53d", "#ff4b2e", "#f4f0e4", "#1d2bb0"],
       });
+    }
+
+    setTimeout(() => {
+      setCoolingDown(false);
+    }, 1500);
+  };
+
+  const copyTicket = () => {
+    if (!ticket) return;
+    const issuedTo = name.trim() || "A friendly stranger";
+    const greetingText = ticket.greeting.native
+      ? `${ticket.greeting.native} (${ticket.greeting.word})`
+      : ticket.greeting.word;
+    const text = `🎟️ HELLO MUSEUM SOUVENIR TICKET\n--------------------------------\nGreeting: ${greetingText}\nPronunciation: “${ticket.greeting.say}”\nLanguage: ${ticket.greeting.lang} (${ticket.greeting.region})\nIssued to: ${issuedTo}\nSerial: ${ticket.serial}\nStatus: Valid Forever\nCurated by: https://abhiishek.is-a.dev/`;
+
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(text).catch(() => {});
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2200);
     }
   };
 
@@ -86,11 +116,33 @@ export function Ticket() {
               wall. Use it the same day for best results.
             </p>
             <form onSubmit={issue} className="mt-8 flex max-w-lg flex-col gap-3 sm:flex-row">
+              {/* Strix Dual Honeypot fields */}
+              <input
+                type="checkbox"
+                name="botcheck"
+                className="hidden"
+                tabIndex={-1}
+                autoComplete="off"
+                checked={botcheck}
+                onChange={(e) => setBotcheck(e.target.checked)}
+                aria-hidden="true"
+              />
+              <input
+                type="text"
+                name="_gotcha"
+                tabIndex={-1}
+                autoComplete="off"
+                value={gotcha}
+                onChange={(e) => setGotcha(e.target.value)}
+                className="hidden"
+                aria-hidden="true"
+              />
+
               <label className="flex-1">
                 <span className="sr-only">Who are you greeting?</span>
                 <input
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => setName(e.target.value.replace(/<[^>]*>?/gm, "").slice(0, 28))}
                   maxLength={28}
                   placeholder="Who are you greeting?"
                   className="w-full border-2 border-chalk/25 bg-transparent px-4 py-3.5 font-mono text-sm text-chalk placeholder:text-chalk/35 focus:border-sun"
@@ -98,10 +150,15 @@ export function Ticket() {
               </label>
               <button
                 type="submit"
-                className="group flex items-center justify-center gap-3 bg-sun px-6 py-3.5 font-mono text-xs font-semibold uppercase tracking-[0.25em] text-midnight transition-all duration-200 hover:-translate-y-0.5 hover:bg-chalk hover:shadow-[6px_6px_0_rgba(255,75,46,0.5)] active:translate-y-0 active:scale-[0.98]"
+                disabled={coolingDown}
+                className={`group flex items-center justify-center gap-3 bg-sun px-6 py-3.5 font-mono text-xs font-semibold uppercase tracking-[0.25em] text-midnight transition-all duration-200 ${
+                  coolingDown
+                    ? "opacity-60 cursor-not-allowed"
+                    : "hover:-translate-y-0.5 hover:bg-chalk hover:shadow-[6px_6px_0_rgba(255,75,46,0.5)] active:translate-y-0 active:scale-[0.98]"
+                }`}
               >
                 <WaveHand className="h-4 w-4 transition-transform duration-300 group-hover:rotate-12" />
-                Print my hello
+                {coolingDown ? "Stamping…" : "Print my hello"}
               </button>
             </form>
             <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.2em] text-chalk/40">
@@ -167,6 +224,16 @@ export function Ticket() {
                           </p>
                         </div>
                       </div>
+
+                      {/* Ticket quick actions */}
+                      <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-midnight/15 pt-4">
+                        <button
+                          onClick={copyTicket}
+                          className="flex items-center gap-1.5 border border-midnight/40 bg-midnight/10 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-midnight transition-colors hover:bg-midnight hover:text-sun"
+                        >
+                          {copied ? "✓ Copied!" : "Copy ticket card"}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </article>
@@ -185,7 +252,8 @@ export function Ticket() {
               <div className="mt-6 text-center">
                 <button
                   onClick={() => issue()}
-                  className="link-line font-mono text-[11px] uppercase tracking-[0.3em] text-sun"
+                  disabled={coolingDown}
+                  className="link-line font-mono text-[11px] uppercase tracking-[0.3em] text-sun disabled:opacity-50"
                 >
                   Stamp another one
                 </button>

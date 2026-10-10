@@ -344,6 +344,15 @@ export function Header() {
                 </span>
                 hellos
               </p>
+              <a
+                href="https://abhiishek.is-a.dev/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden items-center gap-1.5 border border-chalk/20 bg-midnight/60 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-chalk/80 transition-all duration-200 hover:-translate-y-0.5 hover:border-sun hover:text-sun sm:flex"
+                title="Curator Portfolio"
+              >
+                Curator ↗
+              </a>
               <button
                 onClick={() => {
                   const turningOn = !soundOn;
@@ -493,9 +502,22 @@ export function Footer() {
             </a>
           ))}
         </div>
-        <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-chalk/40">
-          Est. 1827, on record — {new Date().getFullYear()} everywhere
-        </p>
+        <div className="flex flex-col gap-1.5">
+          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-chalk/40">
+            Est. 1827, on record — {new Date().getFullYear()} everywhere
+          </p>
+          <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-chalk/60">
+            Curated & Built by{" "}
+            <a
+              href="https://abhiishek.is-a.dev/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sun underline decoration-sun/40 underline-offset-4 transition-colors hover:text-chalk hover:decoration-chalk"
+            >
+              Abhishek
+            </a>
+          </p>
+        </div>
       </div>
     </footer>
   );

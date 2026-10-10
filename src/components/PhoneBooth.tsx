@@ -1,10 +1,10 @@
 import { useRef, useState } from "react";
 import { GREETINGS } from "../data/greetings";
 import { SectionHead, Reveal } from "./Chrome";
-import { chimeSound, clickSound, ringFor, speakGreeting } from "../sound";
+import { chimeSound, clickSound, ringFor, speakGreeting, dialToneSound } from "../sound";
 import { addHello } from "../store";
 
-function RotaryPhone({ ringing }: { ringing: boolean }) {
+function RotaryPhone({ ringing, onDial }: { ringing: boolean; onDial?: (digit: number) => void }) {
   return (
     <svg
       viewBox="0 0 240 200"
@@ -41,14 +41,22 @@ function RotaryPhone({ ringing }: { ringing: boolean }) {
       {Array.from({ length: 10 }).map((_, i) => {
         const a = (Math.PI * 2 * i) / 10 - Math.PI / 2;
         return (
-          <circle
+          <g
             key={i}
-            cx={120 + Math.cos(a) * 20}
-            cy={146 + Math.sin(a) * 20}
-            r="3.4"
-            fill="var(--color-chalk)"
-            opacity="0.85"
-          />
+            onClick={() => onDial?.(i)}
+            role="button"
+            tabIndex={0}
+            className="cursor-pointer group"
+          >
+            <circle
+              cx={120 + Math.cos(a) * 20}
+              cy={146 + Math.sin(a) * 20}
+              r="4.2"
+              fill="var(--color-chalk)"
+              opacity="0.9"
+              className="transition-all duration-150 group-hover:scale-125 group-hover:fill-sun"
+            />
+          </g>
         );
       })}
       {/* feet */}
@@ -69,6 +77,21 @@ export function PhoneBooth() {
     clickSound();
     setSide(s);
     setBubble(s === "edison" ? "Hello!" : "Ahoy!");
+  };
+
+  const dialDigit = (digit: number) => {
+    dialToneSound(digit);
+    if (!ringing) {
+      setBubble(`Dialing line #${digit}…`);
+      const timer = window.setTimeout(() => {
+        const matching = GREETINGS.filter((_, idx) => idx % 10 === digit);
+        const pickOne = matching[Math.floor(Math.random() * matching.length)] || GREETINGS[0];
+        setBubble(`${pickOne.native ?? pickOne.word}!`);
+        speakGreeting(pickOne);
+        addHello(1);
+      }, 420);
+      return () => window.clearTimeout(timer);
+    }
   };
 
   const ring = () => {
@@ -164,7 +187,7 @@ export function PhoneBooth() {
               {ringing ? "· · · ringing · · ·" : "Ring the operator"}
             </button>
             <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.2em] text-chalk/40">
-              Someone, somewhere, always picks up
+              Someone, somewhere, always picks up · Click dial circles to trigger mechanical tones
             </p>
           </Reveal>
 
@@ -194,7 +217,7 @@ export function PhoneBooth() {
               </div>
 
               <div className={`aspect-[6/5] w-full text-chalk ${ringing ? "ringing" : ""}`}>
-                <RotaryPhone ringing={ringing} />
+                <RotaryPhone ringing={ringing} onDial={dialDigit} />
               </div>
 
               <p className="mt-4 border-t border-chalk/15 pt-4 text-center font-mono text-[10px] uppercase tracking-[0.25em] text-chalk/50">

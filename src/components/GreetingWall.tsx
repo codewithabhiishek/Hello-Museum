@@ -5,6 +5,8 @@ import { clickSound, popSound, speakGreeting } from "../sound";
 import { addHello } from "../store";
 
 function ExhibitLabel({ g, onClose, onShuffle }: { g: Greeting; onClose: () => void; onShuffle: () => void }) {
+  const [copied, setCopied] = useState(false);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -12,6 +14,16 @@ function ExhibitLabel({ g, onClose, onShuffle }: { g: Greeting; onClose: () => v
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
+
+  const copyGreeting = () => {
+    clickSound();
+    const text = `${g.native ? `${g.native} (${g.word})` : g.word} — “${g.say}” (${g.lang})`;
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(text).catch(() => {});
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2200);
+    }
+  };
 
   return (
     <div
@@ -21,7 +33,7 @@ function ExhibitLabel({ g, onClose, onShuffle }: { g: Greeting; onClose: () => v
       aria-label={`${g.word} — ${g.lang} greeting`}
     >
       <button
-        className="absolute inset-0 bg-abyss/85"
+        className="absolute inset-0 bg-abyss/85 backdrop-blur-sm"
         onClick={onClose}
         aria-label="Close exhibit label"
       />
@@ -71,6 +83,12 @@ function ExhibitLabel({ g, onClose, onShuffle }: { g: Greeting; onClose: () => v
             >
               <SpeakerIcon on className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
               Hear it spoken
+            </button>
+            <button
+              onClick={copyGreeting}
+              className="flex items-center gap-2.5 border-2 border-midnight bg-chalk/60 px-5 py-3 font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-midnight transition-all duration-200 hover:-translate-y-0.5 hover:bg-chalk"
+            >
+              {copied ? "✓ Copied!" : "Copy greeting"}
             </button>
             <button
               onClick={onShuffle}
@@ -181,7 +199,7 @@ export function GreetingWall() {
               tabIndex={0}
               role="button"
               aria-label={`Open exhibit label for ${g.word}, ${g.lang}`}
-              className="cardin group relative flex cursor-pointer flex-col justify-between overflow-hidden border border-chalk/15 bg-white/[0.03] p-5 transition-all duration-300 hover:-translate-y-1 hover:-rotate-1 hover:border-sun hover:bg-sun hover:text-midnight hover:shadow-[6px_6px_0_rgba(255,197,61,0.25)]"
+              className="cardin glass-placard group relative flex cursor-pointer flex-col justify-between overflow-hidden p-5 transition-all duration-300 hover:-translate-y-1 hover:-rotate-1 hover:border-sun hover:bg-sun hover:text-midnight hover:shadow-[8px_8px_0_rgba(255,197,61,0.3)]"
               style={{ animationDelay: `${Math.min(i * 22, 500)}ms` }}
             >
               <span className="absolute right-4 top-4 flex items-center gap-2">

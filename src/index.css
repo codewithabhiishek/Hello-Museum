@@ -233,6 +233,54 @@ body {
   box-shadow: 0 1px 4px rgba(7, 11, 58, 0.25);
 }
 
+/* ---------- museum glass placards & interactive surfaces ---------- */
+
+.glass-placard {
+  background: rgba(11, 17, 82, 0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(244, 240, 228, 0.14);
+  box-shadow: 0 10px 36px -6px rgba(7, 11, 58, 0.75);
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.glass-placard:hover {
+  border-color: rgba(255, 197, 61, 0.4);
+  box-shadow: 0 14px 40px -4px rgba(255, 197, 61, 0.15), 0 10px 36px -6px rgba(7, 11, 58, 0.85);
+  transform: translateY(-2px);
+}
+
+.glass-placard-sun {
+  background: rgba(255, 197, 61, 0.07);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 197, 61, 0.25);
+  box-shadow: 0 8px 30px -4px rgba(255, 197, 61, 0.1);
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.glass-placard-sun:hover {
+  border-color: rgba(255, 197, 61, 0.55);
+  box-shadow: 0 12px 36px -4px rgba(255, 197, 61, 0.22);
+  transform: translateY(-2px);
+}
+
+.glow-orb-museum {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  pointer-events: none;
+  opacity: 0.25;
+}
+
+.glow-orb-blue {
+  background: radial-gradient(circle, rgba(155, 165, 255, 0.8) 0%, rgba(29, 43, 176, 0.2) 70%, transparent 100%);
+}
+
+.glow-orb-gold {
+  background: radial-gradient(circle, rgba(255, 197, 61, 0.8) 0%, rgba(255, 75, 46, 0.15) 70%, transparent 100%);
+}
+
 input:focus-visible,
 button:focus-visible,
 a:focus-visible {

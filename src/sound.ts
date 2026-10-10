@@ -111,16 +111,28 @@ function noiseHit({
   src.stop(t0 + dur + 0.05);
 }
 
-/* ---------------- the cues ---------------- */
+/* ---------------- haptics & cues ---------------- */
+
+/** Safe physical haptic pulse for touch/mobile devices */
+export function haptic(pattern: number | number[] = 15) {
+  if (typeof window === "undefined" || !("navigator" in window) || !("vibrate" in navigator)) return;
+  try {
+    navigator.vibrate(pattern);
+  } catch {
+    /* unsupported or user disallowed */
+  }
+}
 
 /** short tactile blip for buttons & chips */
 export function clickSound() {
+  haptic(15);
   tone({ freq: 940, type: "square", dur: 0.055, gain: 0.07 });
   tone({ freq: 1880, type: "sine", dur: 0.04, gain: 0.05 });
 }
 
 /** warm pop when something appears */
 export function popSound() {
+  haptic(25);
   tone({ freq: 520, freqEnd: 165, type: "triangle", dur: 0.14, gain: 0.22 });
   noiseHit({ dur: 0.06, gain: 0.05, freq: 2400, type: "highpass" });
 }
@@ -135,6 +147,7 @@ export function tickSound() {
 
 /** bell-ish chime for answered calls & small victories */
 export function chimeSound() {
+  haptic([20, 40, 60]);
   const notes = [659.25, 987.77, 1318.5];
   notes.forEach((f, i) => {
     tone({ freq: f, type: "sine", dur: 0.85, gain: 0.12, delay: i * 0.07 });
@@ -144,18 +157,36 @@ export function chimeSound() {
 
 /** heavy press-stamp thunk for the ticket machine */
 export function stampSound() {
+  haptic([35, 50, 75]);
   tone({ freq: 150, freqEnd: 52, type: "sine", dur: 0.16, gain: 0.5 });
   noiseHit({ dur: 0.11, gain: 0.3, freq: 420, q: 0.6, type: "lowpass" });
   tone({ freq: 2100, type: "square", dur: 0.03, gain: 0.05, delay: 0.02 });
 }
 
+/** tactile card flip sound for exhibit inspection */
+export function cardFlipSound() {
+  haptic(20);
+  tone({ freq: 380, freqEnd: 620, type: "sine", dur: 0.07, gain: 0.12 });
+  noiseHit({ dur: 0.04, gain: 0.08, freq: 1600, type: "bandpass" });
+}
+
+/** vintage rotary pulse / mechanical dial click */
+export function dialToneSound(digit = 1) {
+  haptic(18);
+  const baseFreq = 350 + (digit % 10) * 45;
+  tone({ freq: baseFreq, type: "triangle", dur: 0.065, gain: 0.14 });
+  tone({ freq: baseFreq * 1.5, type: "sine", dur: 0.05, gain: 0.08, delay: 0.01 });
+}
+
 /** airy whoosh for confetti moments */
 export function whooshSound() {
+  haptic(30);
   noiseHit({ dur: 0.55, gain: 0.12, freq: 320, q: 1.4, type: "bandpass", sweepTo: 2600 });
 }
 
 /** classic telephone ringback (440 + 480 Hz, pulsed) for `ms` */
 export function ringFor(ms: number): () => void {
+  haptic([180, 120, 180, 120, 180]);
   const c = ensureCtx();
   if (!c || !master) return () => {};
   const t0 = c.currentTime;
