@@ -3,6 +3,7 @@ import { GREETINGS } from "../data/greetings";
 import { SectionHead, Reveal } from "./Chrome";
 import { chimeSound, clickSound, ringFor, speakGreeting, dialToneSound } from "../sound";
 import { addHello } from "../store";
+import { haptics } from "../haptics";
 
 function RotaryPhone({ ringing, onDial }: { ringing: boolean; onDial?: (digit: number) => void }) {
   return (
@@ -75,12 +76,14 @@ export function PhoneBooth() {
 
   const pick = (s: "edison" | "bell") => {
     clickSound();
+    haptics.select();
     setSide(s);
     setBubble(s === "edison" ? "Hello!" : "Ahoy!");
   };
 
   const dialDigit = (digit: number) => {
     dialToneSound(digit);
+    haptics.dial();
     if (!ringing) {
       setBubble(`Dialing line #${digit}…`);
       const timer = window.setTimeout(() => {
@@ -97,6 +100,7 @@ export function PhoneBooth() {
   const ring = () => {
     if (ringing) return;
     setRinging(true);
+    haptics.ring();
     stopRingRef.current = ringFor(1400);
     if (timerRef.current) window.clearTimeout(timerRef.current);
     timerRef.current = window.setTimeout(() => {

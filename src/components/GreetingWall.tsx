@@ -3,6 +3,7 @@ import { GREETINGS, REGIONS, type Greeting, type Region } from "../data/greeting
 import { SectionHead, Reveal, SpeakerIcon, Asterisk, CloseIcon } from "./Chrome";
 import { clickSound, popSound, speakGreeting } from "../sound";
 import { addHello } from "../store";
+import { haptics } from "../haptics";
 
 function ExhibitLabel({ g, onClose, onShuffle }: { g: Greeting; onClose: () => void; onShuffle: () => void }) {
   const [copied, setCopied] = useState(false);
@@ -17,6 +18,7 @@ function ExhibitLabel({ g, onClose, onShuffle }: { g: Greeting; onClose: () => v
 
   const copyGreeting = () => {
     clickSound();
+    haptics.success();
     const text = `${g.native ? `${g.native} (${g.word})` : g.word} — “${g.say}” (${g.lang})`;
     if (navigator?.clipboard?.writeText) {
       navigator.clipboard.writeText(text).catch(() => {});
@@ -110,12 +112,14 @@ export function GreetingWall() {
 
   const openCard = (g: Greeting) => {
     popSound();
+    haptics.tap();
     addHello(1);
     setSelected(g);
   };
 
   const shuffleCard = () => {
     popSound();
+    haptics.tap();
     setSelected(GREETINGS[Math.floor(Math.random() * GREETINGS.length)]);
   };
 
@@ -151,7 +155,10 @@ export function GreetingWall() {
               return (
                 <button
                   key={r}
-                  onClick={() => setRegion(r)}
+                  onClick={() => {
+                    haptics.select();
+                    setRegion(r);
+                  }}
                   className={`group flex items-center gap-2 border-2 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.18em] transition-all duration-200 active:scale-95 ${
                     active
                       ? "border-sun bg-sun text-midnight"

@@ -85,10 +85,12 @@ npm run build
 ## 🛠️ Architecture & Technologies
 
 - **UI Framework**: [React 18](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
-- **Build Engine**: [Vite 6](https://vitejs.dev/) with optimized modular vendor chunking
+- **Build Engine**: [Vite 6.4.5](https://vitejs.dev/) with optimized modular vendor chunking
 - **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) with frosted museum glass placards, brutalist editorial typography, and cyber token accents
-- **Audio & Haptic Engine**: Web Speech Synthesis API + Synthesized Web Audio API oscillators + tactile haptic feedback (`navigator.vibrate`)
-- **Security & Quality**: 0 npm vulnerabilities (`npm audit` clean), Strix dual-honeypot form protection, and automated Node test suite
+- **Audio Engine**: Web Speech Synthesis API + Synthesized Web Audio API oscillators + rotary pulse generators
+- **Tactile Mobile Haptics**: Custom vibration feedback engine (`src/haptics.ts`) for dialing, ticket stamping, card selection, and easter eggs
+- **Multi-User Data Isolation**: User-scoped storage keys (`getScopedKey`) preventing cross-visitor hello tally and ticket count collision
+- **Security & Quality**: 0 npm vulnerabilities (`npm audit` clean), Strix dual-honeypot form protection, and 17 automated Node test suites (100% passing)
 
 ---
 

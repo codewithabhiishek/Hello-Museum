@@ -4,6 +4,7 @@ import { useInView, usePrefersReducedMotion } from "../hooks";
 import { MARQUEE_WORDS } from "../data/greetings";
 import { clickSound, chimeSound, toggleMuted, useSoundEnabled } from "../sound";
 import { addHello, useHelloCount } from "../store";
+import { haptics } from "../haptics";
 
 /* ---------- small custom SVG marks ---------- */
 
@@ -348,6 +349,7 @@ export function Header() {
                 href="https://abhiishek.is-a.dev/"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => haptics.tap()}
                 className="hidden items-center gap-1.5 border border-chalk/20 bg-midnight/60 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-chalk/80 transition-all duration-200 hover:-translate-y-0.5 hover:border-sun hover:text-sun sm:flex"
                 title="Curator Portfolio"
               >
@@ -355,6 +357,7 @@ export function Header() {
               </a>
               <button
                 onClick={() => {
+                  haptics.tap();
                   const turningOn = !soundOn;
                   toggleMuted();
                   if (turningOn) clickSound();
@@ -439,6 +442,7 @@ export function EasterEgg() {
       buf.current = "";
       addHello(5);
       chimeSound();
+      haptics.easterEgg();
       if (!reduced) {
         confetti({
           particleCount: 110,

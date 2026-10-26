@@ -5,6 +5,7 @@ import { SectionHead, Reveal, WaveHand } from "./Chrome";
 import { stampSound, whooshSound } from "../sound";
 import { addHello } from "../store";
 import { usePrefersReducedMotion } from "../hooks";
+import { haptics } from "../haptics";
 
 interface TicketData {
   greeting: Greeting;
@@ -51,14 +52,21 @@ export function Ticket() {
   const issue = (e?: FormEvent) => {
     e?.preventDefault();
     // Strix Honeypot Defense: Silently drop if bot traps are tripped
-    if (botcheck || gotcha.trim().length > 0) return;
-    if (coolingDown) return;
+    if (botcheck || gotcha.trim().length > 0) {
+      haptics.error();
+      return;
+    }
+    if (coolingDown) {
+      haptics.error();
+      return;
+    }
 
     setCoolingDown(true);
     setTicket(rollTicket());
     setStampKey((k) => k + 1);
     stampSound();
     whooshSound();
+    haptics.stamp();
     addHello(1);
     if (!reduced) {
       confetti({
@@ -77,6 +85,7 @@ export function Ticket() {
 
   const copyTicket = () => {
     if (!ticket) return;
+    haptics.success();
     const issuedTo = name.trim() || "A friendly stranger";
     const greetingText = ticket.greeting.native
       ? `${ticket.greeting.native} (${ticket.greeting.word})`
